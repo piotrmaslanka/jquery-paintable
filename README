@@ -1,18 +1,22 @@
-Paintable is a jQuery plugin that makes any HTML canvas element paintable
+paintable
+=========
+Paintable is a jQuery plugin that makes any HTML <canvas> element paintable
 
 Usage
-Include paintable.js using
-    <script src="http://www.golfsinteppadon.com/paintable.js"></script>
+Download and include paintable.js
+    <script src="paintable.js"></script>
 Call paintable
     $('#canvas').paintable();
 
-Initializing paintable creates a paintable canvas, allowing users to draw on it. To use other tools, call methods to change tools and colors
+Initializing paintable creates a paintable canvas, allowing users to draw on it. You can change tools and colors or do other things by calling methods.
 
 Methods
 .paintable('setTool', toolName)
 
-toolName possibilities: "pencil", "eraser", "floodFill", "stamp"
+toolName can be "pencil" or "eraser"
 
 .paintable('setColor', color)
+
 .paintable('save')
+
 .paintable('undo')

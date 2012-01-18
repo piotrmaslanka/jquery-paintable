@@ -2,8 +2,10 @@
  * Paintable jQuery plugin
  * Make an HTML canvas paintable
  *
- * @param options
- * { }
+ * Golf Sinteppadon
+ * 
+ * Methods:
+ *
  */
 (function($) {
     $.fn.paintable = function(method) {
@@ -28,37 +30,38 @@
             setColor: function(color) {
                 return this.each(function() {
                     $(this).data('currentColor', color);
-                    this.getContext("2d").fillStyle = this.getContext("2d").strokeStyle = color;
                 });
             },
 
+            /**
+             * Set the drawing context's properties to match the new tool and set .data('currentTool', tool)
+             *
+             * @param tool the new tool to use, can be "pencil", "eraser", "floodFill", "stamp"
+             */
             setTool: function(tool) {
                 return this.each(function() {
                     var ctx = this.getContext("2d");
                     switch (tool) {
                         case "pencil":
                             $(this).css('cursor', 'url(pencil.png) 0 16, crosshair');
-                            ctx.strokeStyle = $(this).data('currentColor');
                             ctx.lineWidth = 1.5;
                             ctx.lineCap = "butt";
                             break;
-
                         case "eraser":
                             $(this).css('cursor', 'url(eraserCursor.png) 8 8, crosshair');
-                            ctx.fillStyle = "white";
-                            ctx.strokeStyle = "white";
                             ctx.lineWidth = 16;
                             ctx.lineCap = "round";
                             break;
-
                         case "floodFill":
                             $(this).css('cursor', 'url(floodFill.png) 14 11, crosshair');
                             ctx.fillStyle = $(this).data('currentColor');
                             break;
-
                         case "stamp":
                             $(this).css('cursor', 'url(lilypad.png) 64 44, crosshair');
                             break;
+                        default:
+                            alert("tool not found");
+                            return;
                     }
 
                     $(this).data('currentTool', tool);
@@ -68,6 +71,7 @@
             init: function() {
                 var _ = {
                     self: null,
+                    ctx: null,
                     dragging: false,
                     oldCoords: {x: 0, y: 0}, // The mouse's previous coords
 
@@ -78,10 +82,12 @@
 
                         switch ($(_.self).data('currentTool')) {
                             case "pencil":
+                                _.ctx.strokeStyle = $(this).data('currentColor');
                                 _.ctx.fillRect(currentX - 1, currentY - 1, 2, 2);
                                 break;
 
                             case "eraser":
+                                _.ctx.strokeStyle = _.ctx.fillStyle = '#FFFFFF';
                                 _.ctx.beginPath();
                                 _.ctx.arc(currentX, currentY, 8, 0, Math.PI * 2, false);
                                 _.ctx.fill();

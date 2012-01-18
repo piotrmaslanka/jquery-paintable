@@ -9,15 +9,15 @@ Demo
 Usage
 -----
 
-1. Download and include paintable.js
+1. Download and include jquery-paintable.js
 
-    `<script src="paintable.js"></script>`
+    `<script src="jquery-paintable.js"></script>`
 
 2. Initialize paintable
 
     `$('#canvas').paintable();`
 
-Initializing paintable allows users to draw on it. Changing tools, colors or other things can be done by calling methods.
+Initializing jquery-paintable allows users to draw on the canvas. Changing tools, colors or other things can be done by calling methods.
 
 Methods
 -------

@@ -17,7 +17,7 @@ Usage
 
     `$('#canvas').paintable();`
 
-Initializing paintable creates a paintable canvas, allowing users to draw on it. Changing tools, colors or other things can be done by calling methods.
+Initializing paintable allows users to draw on it. Changing tools, colors or other things can be done by calling methods.
 
 Methods
 -------

@@ -22,18 +22,18 @@ Initializing paintable creates a paintable canvas, allowing users to draw on it.
 Methods
 -------
 
-- `.paintable('setTool', toolName)`
+**setTool** `.paintable('setTool', toolName)`
 
-  Set the tool to be used. toolName can be "pencil" or "eraser"
+> Set the tool to be used. toolName can be "pencil" or "eraser"
 
-- `.paintable('setColor', color)`
+**setColor** `.paintable('setColor', color)`
 
-  Set the color to use with the "pencil" tool. color is any valid CSS color string
+> Set the color to use with the "pencil" tool. color is any valid CSS color string
 
-- `.paintable('save')`
+**save** `.paintable('save')`
 
-  Open a new window showing an image of the canvas
+> Open a new window showing an image of the canvas
 
-- `.paintable('undo')`
+**undo** `.paintable('undo')`
 
-  Undo the last user action
+> Undo the last user action

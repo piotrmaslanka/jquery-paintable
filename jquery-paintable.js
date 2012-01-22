@@ -25,36 +25,29 @@
                 });
             },
 
-            setColor: function(color) {
+            option: function(key, value) {
+                if (!value) {
+                    return this.data('options')[key];
+                }
                 return this.each(function() {
-                    $(this).data('currentColor', color);
+                    var options = {};
+                    options[key] = value; // Set options[key], not options.key which actually names it 'key'
+                    $(this).paintable('options', options);
                 });
             },
-
-            setTool: function(tool) {
+            
+            options: function(options) {
                 return this.each(function() {
+                    $(this).data('options', $.extend($(this).data('options'), options));
+                    
                     var ctx = this.getContext("2d");
-                    switch (tool) {
-                        case "pencil":
-                            $(this).css('cursor', 'url(pencil.png) 0 16, crosshair');
-                            ctx.lineWidth = 1.5;
-                            ctx.lineCap = "butt";
-                            break;
-                        case "eraser":
-                            $(this).css('cursor', 'url(eraserCursor.png) 8 8, crosshair');
-                            ctx.lineWidth = 16;
-                            ctx.lineCap = "round";
-                            break;
-                        default:
-                            console.warn('Provided tool not found: ' + tool);
-                            return;
-                    }
-
-                    $(this).data('currentTool', tool);
+                    ctx.strokeStyle = ctx.fillStyle = $(this).data('options').color;
+                    ctx.lineWidth = $(this).data('options').width;
+                    $(this).css('cursor', $(this).data('options').cursor);
                 });
             },
 
-            init: function() {
+            init: function(options) {
                 var _ = {
                     self: null,
                     ctx: null,
@@ -63,22 +56,10 @@
 
                     mousedown: function(e) {
                         _.dragging = true;
-                        var currentX = e.pageX - $(_.self).offset().left;
-                        var currentY = e.pageY - $(_.self).offset().top;
+                        var coords = {x: e.pageX - $(_.self).offset().left, y: e.pageY - $(_.self).offset().top};
 
-                        switch ($(_.self).data('currentTool')) {
-                            case "pencil":
-                                _.ctx.strokeStyle = $(this).data('currentColor');
-                                _.ctx.fillRect(currentX - 1, currentY - 1, 2, 2);
-                                break;
-
-                            case "eraser":
-                                _.ctx.strokeStyle = _.ctx.fillStyle = '#FFFFFF';
-                                _.ctx.beginPath();
-                                _.ctx.arc(currentX, currentY, 8, 0, Math.PI * 2, false);
-                                _.ctx.fill();
-                                break;
-                        }
+                        _.ctx.arc(coords.x, coords.y, $(this).data('options').width / 2, 0, Math.PI * 2, false);
+                        _.ctx.fill();
                     },
 
                     mouseup: function() {
@@ -89,42 +70,45 @@
                     },
 
                     mousemove: function(e) {
-                        if ($(_.self).data('currentTool') == "pencil" || $(_.self).data('currentTool') == "eraser") {
-                            _.ctx.beginPath();
-                            _.ctx.moveTo(_.oldCoords.x, _.oldCoords.y);
+                        _.ctx.beginPath();
+                        _.ctx.moveTo(_.oldCoords.x, _.oldCoords.y);
 
-                            var currentX = e.pageX - $(_.self).offset().left;
-                            var currentY = e.pageY - $(_.self).offset().top;
-                            if (_.dragging) {
-                                _.ctx.lineTo(currentX, currentY);
-                                _.ctx.stroke();
-                            }
-                            _.oldCoords = {x: currentX, y: currentY};
+                        var coords = {x: e.pageX - $(_.self).offset().left, y: e.pageY - $(_.self).offset().top};
+                        if (_.dragging) {
+                            _.ctx.lineTo(coords.x, coords.y);
+                            _.ctx.stroke();
                         }
+                        _.oldCoords = {x: coords.x, y: coords.y};
                     },
                 };
 
                 return this.each(function() {
-                    if (!$(this).getContext) {
+                    if (!this.getContext) {
                         console.error('$(this).getContent not found - element is not a canvas or browser does not support <canvas>');
                         return;
                     }
 
                     _.self = this;
+                    
                     // Setup canvas
                     _.ctx = this.getContext("2d");
+                    _.ctx.lineCap = "round";
 
                     // Setup listeners
                     $(this).on('mousedown', _.mousedown);
                     $(document).on('mouseup', _.mouseup);
                     $(document).on('mousemove', _.mousemove);
 
-                    // Set defaults
-                    _.ctx.fillStyle = "white";
-                    _.ctx.fillRect(0, 0, _.self.width, _.self.height);
+                    // Setup undoStack
                     var emptyImageData = _.ctx.getImageData(0, 0, _.self.width, _.self.height);
                     $(this).data('undoStack', [emptyImageData]);
-                    $(this).paintable('setColor', '#000000').paintable('setTool', 'pencil');
+                    
+                    var defaultOptions = {
+                        color: 'black',
+                        width: '1.5',
+                        cursor: 'crosshair'
+                    }
+                    $(this).paintable('options', $.extend(defaultOptions, options));
                 });
             }
         };
@@ -132,7 +116,7 @@
         // Method calling logic
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if ( typeof method === 'object' || !method) {
+        } else if (typeof method === 'object' || !method) {
             return methods.init.apply(this, arguments);
         } else {
             $.error('Method ' + method + ' does not exist on jQuery.paintable');

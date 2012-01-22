@@ -17,7 +17,22 @@ Usage
 
     `$('#canvas').paintable();`
 
-Initializing jquery-paintable allows users to draw on the canvas. Changing tools, colors or other things can be done by calling methods.
+Initializing paintable allows users to draw on the canvas
+
+Options
+-------
+
+**color** `String` Default: 'black'
+
+> Set the color to draw
+
+**width** `Float` Default: 1.5
+
+> Set the width of the line
+
+**cursor** `String` Default: 'crosshair'
+
+> Set the cursor to show over the canvas
 
 Methods
 -------
@@ -37,3 +52,11 @@ Methods
 **undo** `.paintable('undo')`
 
 > Undo the last user action
+
+**option** `.paintable('option', key, [value])`
+
+> Get or set any option. If no value is specified, will act as a getter
+
+**options** `.paintable('options', options)`
+
+> Set multiple options at once by providing an options object

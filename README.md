@@ -4,7 +4,7 @@ jquery-paintable is a jQuery plugin that makes any HTML `<canvas>` element paint
 
 Demo
 ----
-[http://golfsinteppadon.com/paintable/](http://golfsinteppadon.com/paintable/)
+[http://golfsinteppadon.com/paint/](http://golfsinteppadon.com/paint/)
 
 Usage
 -----

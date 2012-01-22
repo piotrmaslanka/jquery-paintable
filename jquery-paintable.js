@@ -13,15 +13,15 @@
                 return this.each(function() {
                     var undoStack = $(this).data('undoStack');
                     if (undoStack.length > 1) {
-                        undoStack.pop();
-                        this.getContext("2d").putImageData(undoStack[undoStack.length - 1], 0, 0);
+                        undoStack.shift();
+                        this.getContext("2d").putImageData(undoStack[0], 0, 0);
                     }
                 });
             },
 
             save: function() {
                 return this.each(function() {
-                    window.open(this.toDataURL);
+                    window.open(this.toDataURL());
                 });
             },
 
@@ -52,33 +52,37 @@
                     self: null,
                     ctx: null,
                     dragging: false,
-                    oldCoords: {x: 0, y: 0}, // The mouse's previous coords
+                    oldCoords: {x: 0, y: 0},
 
                     mousedown: function(e) {
                         _.dragging = true;
-                        var coords = {x: e.pageX - $(_.self).offset().left, y: e.pageY - $(_.self).offset().top};
 
-                        _.ctx.arc(coords.x, coords.y, $(this).data('options').width / 2, 0, Math.PI * 2, false);
+                        _.ctx.arc(e.pageX - $(_.self).offset().left, // x
+                                  e.pageY - $(_.self).offset().top, // y
+                                  $(this).data('options').width / 2, // radius
+                                  0, // startAngle
+                                  Math.PI * 2, // endAngle
+                                  false // anticlockwise
+                        );
                         _.ctx.fill();
                     },
 
                     mouseup: function() {
                         if (_.dragging) {
                             _.dragging = false;
-                            $(_.self).data('undoStack').push(_.ctx.getImageData(0, 0, _.self.width, _.self.height));
+                            $(_.self).data('undoStack').unshift(_.ctx.getImageData(0, 0, _.self.width, _.self.height));
                         }
                     },
 
                     mousemove: function(e) {
+                        var coords = {x: e.pageX - $(_.self).offset().left, y: e.pageY - $(_.self).offset().top};
                         _.ctx.beginPath();
                         _.ctx.moveTo(_.oldCoords.x, _.oldCoords.y);
-
-                        var coords = {x: e.pageX - $(_.self).offset().left, y: e.pageY - $(_.self).offset().top};
                         if (_.dragging) {
                             _.ctx.lineTo(coords.x, coords.y);
                             _.ctx.stroke();
                         }
-                        _.oldCoords = {x: coords.x, y: coords.y};
+                        _.oldCoords = coords;
                     },
                 };
 
@@ -98,6 +102,7 @@
                     $(this).on('mousedown', _.mousedown);
                     $(document).on('mouseup', _.mouseup);
                     $(document).on('mousemove', _.mousemove);
+                    $(document).mousemove(); // initialize _.oldCoords
 
                     // Setup undoStack
                     var emptyImageData = _.ctx.getImageData(0, 0, _.self.width, _.self.height);

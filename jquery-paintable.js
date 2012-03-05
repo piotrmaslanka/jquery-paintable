@@ -9,6 +9,9 @@
     $.fn.paintable = function(method) {
 
         methods = {
+            /**
+             * Undo the last stroke
+             */
             undo: function() {
                 return this.each(function() {
                     var undoStack = $(this).data('undoStack');
@@ -19,12 +22,21 @@
                 });
             },
 
+            /**
+             * Save the canvas image
+             */
             save: function() {
                 return this.each(function() {
                     window.open(this.toDataURL());
                 });
             },
 
+            /**
+             * Set an option
+             * 
+             * @param key string the key of the option to set
+             * @param value string the value of the option to set
+             */
             option: function(key, value) {
                 if (!value) {
                     return this.data('options')[key];
@@ -36,6 +48,9 @@
                 });
             },
             
+            /**
+             * @param options map map of options to set
+             */
             options: function(options) {
                 return this.each(function() {
                     $(this).data('options', $.extend($(this).data('options'), options));
@@ -47,6 +62,11 @@
                 });
             },
 
+            /**
+             * Initialize the jquery-paintable canvas
+             * 
+             * @param options map optional map of options to set
+             */
             init: function(options) {
                 var _ = {
                     self: null,

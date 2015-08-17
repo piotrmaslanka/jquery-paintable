@@ -68,9 +68,11 @@
              * @param options map optional map of options to set
              */
             init: function(options) {
+
                 var _ = {
                     self: null,
                     ctx: null,
+                    touchSupport: false,
                     dragging: false,
                     oldCoords: {x: 0, y: 0},
 
@@ -87,7 +89,14 @@
                         _.ctx.fill();
                     },
 
-                    mouseup: function() {
+                    touchdown: function(e) {
+                        e.preventDefault();
+                        _.dragging = true;
+                        var t = e.originalEvent.touches.item(0);
+                        _.oldCoords = {x: t.pageX - $(_.self).offset().left, y: t.pageY - $(_.self).offset().top};
+                    },
+
+                    mouseup: function(e) {
                         if (_.dragging) {
                             _.dragging = false;
                             $(_.self).data('undoStack').unshift(_.ctx.getImageData(0, 0, _.self.width, _.self.height));
@@ -104,6 +113,19 @@
                         }
                         _.oldCoords = coords;
                     },
+
+                    touchmove: function(e) {
+                        var t = e.originalEvent.touches.item(0);
+                        var coords = {x: t.pageX - $(_.self).offset().left, y: t.pageY - $(_.self).offset().top};
+                        _.ctx.beginPath();
+                        _.ctx.moveTo(_.oldCoords.x, _.oldCoords.y);
+                        if (_.dragging) {
+                            _.ctx.lineTo(coords.x, coords.y);
+                            _.ctx.stroke();
+                            e.preventDefault();
+                        }
+                        _.oldCoords = coords;
+                    }
                 };
 
                 return this.each(function() {
@@ -123,6 +145,15 @@
                     $(document).on('mouseup', _.mouseup);
                     $(document).on('mousemove', _.mousemove);
                     $(document).mousemove(); // initialize _.oldCoords
+
+                    // optional: set touch support
+                    if (options.hasOwnProperty('touchSupport'))
+                        if (options.touchSupport) {
+                            $(this).on('touchstart', _.touchdown);
+                            $(document).on('touchend', _.mouseup);
+                            $(document).on('touchleave', _.mouseup);
+                            $(document).on('touchmove', _.touchmove);
+                        }
 
                     // Setup undoStack
                     var emptyImageData = _.ctx.getImageData(0, 0, _.self.width, _.self.height);

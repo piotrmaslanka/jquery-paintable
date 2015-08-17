@@ -34,6 +34,10 @@ Options
 
 > Set the width of the line
 
+**touchSupport** `Boolean` Default: false
+
+> Enable touch support (tablets, smartphones)
+
 Methods
 -------
 

@@ -5,10 +5,22 @@
  * By Golf Sinteppadon
  * https://github.com/MiniGolf2000/jquery-paintable
  */
+
 (function($) {
     $.fn.paintable = function(method) {
 
         methods = {
+            /**
+            * Clear the field
+            */
+            clear: function() {
+                return this.each(function() {
+                    var ctx = this.getContext("2d");
+                    $(this).data('undoStack').unshift(ctx.getImageData(0, 0, this.width, this.height));
+                    ctx.clearRect(0, 0,this.width, this.height);
+                });
+            },
+
             /**
              * Undo the last stroke
              */
@@ -75,6 +87,9 @@
                     touchSupport: false,
                     dragging: false,
                     oldCoords: {x: 0, y: 0},
+                    startX: null,           // this is canvas' offset-left, offset-top.
+                    startY: null,           // because they change during zoom, tablet painting doesn't work right.
+                                            // we need them loaded statically at start
 
                     mousedown: function(e) {
                         _.dragging = true;
@@ -93,7 +108,7 @@
                         e.preventDefault();
                         _.dragging = true;
                         var t = e.originalEvent.touches.item(0);
-                        _.oldCoords = {x: t.pageX - $(_.self).offset().left, y: t.pageY - $(_.self).offset().top};
+                        _.oldCoords = {x: t.pageX - _.startX, y: t.pageY - _.startY};
                     },
 
                     mouseup: function(e) {
@@ -116,7 +131,8 @@
 
                     touchmove: function(e) {
                         var t = e.originalEvent.touches.item(0);
-                        var coords = {x: t.pageX - $(_.self).offset().left, y: t.pageY - $(_.self).offset().top};
+                        var coords = {x: t.pageX - _.startX,
+                                      y: t.pageY - _.startY };
                         _.ctx.beginPath();
                         _.ctx.moveTo(_.oldCoords.x, _.oldCoords.y);
                         if (_.dragging) {
@@ -139,6 +155,10 @@
                     // Setup canvas
                     _.ctx = this.getContext("2d");
                     _.ctx.lineCap = "round";
+
+                    // Setup startX, startY
+                    _.startX = $(this).offset().left;
+                    _.startY = $(this).offset().top;
 
                     // Setup listeners
                     $(this).on('mousedown', _.mousedown);

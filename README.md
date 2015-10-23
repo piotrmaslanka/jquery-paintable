@@ -56,3 +56,7 @@ Methods
 **undo** `.paintable('undo')`
 
 > Undo the last user action
+
+**clear** `.paintable('clear')`
+
+> Clears the canvas
